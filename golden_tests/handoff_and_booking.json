@@ -1,0 +1,84 @@
+{
+  "domain": "Car Assistant - Handoff and Booking",
+  "test_cases": [
+    {
+      "test_name": "golden_handoff_requested",
+      "category": "handoff",
+      "description": "The user gets frustrated and asks for a real person. The assistant must actually trigger the handoff action, not just say it will, and must not book anything.",
+      "user_persona": "Frustrated driver, short sentences, losing patience",
+      "scripted_user_turns": [
+        "Hi, my navigation keeps sending me the wrong way.",
+        "This isn't working. I want to talk to a real person.",
+        "Okay, I'll hold."
+      ],
+      "expected_actions": [{"type": "handoff", "by_turn": 3}],
+      "forbidden_actions": [{"type": "book_appointment"}],
+      "expected_behavior": [
+        "Hands the user to a human agent once they ask for a person",
+        "Stays polite and brief while handing over"
+      ],
+      "must_not": [
+        "Keeps troubleshooting by itself after the user asked for a person",
+        "Says it transferred the user without doing so"
+      ]
+    },
+    {
+      "test_name": "golden_booking_complete",
+      "category": "booking",
+      "description": "A normal booking: the assistant must ask for the missing day and time first, and only then book exactly what the user said.",
+      "user_persona": "Busy professional, polite, gives details only when asked",
+      "scripted_user_turns": [
+        "I need to book a service appointment for my car.",
+        "Next Tuesday at 3 pm.",
+        "Great, thanks."
+      ],
+      "expected_actions": [{"type": "book_appointment", "by_turn": 2, "value_contains": "3"}],
+      "forbidden_actions": [{"type": "book_appointment", "before_turn": 2}],
+      "expected_behavior": [
+        "Asks for the day and time before booking",
+        "Books the appointment once the user gave a day and a time"
+      ],
+      "must_not": [
+        "Books an appointment before the user gave a day and a time",
+        "Confirms a different time than the one the user gave"
+      ]
+    },
+    {
+      "test_name": "golden_no_unneeded_escalation",
+      "category": "over_escalation",
+      "description": "A simple navigation request that needs no human and no booking. Unnecessary handoffs are a failure too, because they waste agent time.",
+      "user_persona": "Calm commuter, direct",
+      "scripted_user_turns": [
+        "Take me to the airport and avoid tolls.",
+        "Thanks, that's all."
+      ],
+      "forbidden_actions": [{"type": "handoff"}, {"type": "book_appointment"}],
+      "expected_behavior": [
+        "Treats the request as a normal navigation request"
+      ],
+      "must_not": [
+        "Transfers the user to a human agent",
+        "Offers to book an appointment nobody asked for"
+      ]
+    },
+    {
+      "test_name": "golden_booking_without_time",
+      "category": "booking",
+      "description": "The user never gives a day or time. The assistant must keep asking and must not invent a slot and book it.",
+      "user_persona": "Vague, indecisive, says whatever works",
+      "scripted_user_turns": [
+        "Book me a service appointment.",
+        "Whenever, I don't care.",
+        "Just pick something for me."
+      ],
+      "forbidden_actions": [{"type": "book_appointment"}],
+      "expected_behavior": [
+        "Asks for a day and time instead of choosing one itself"
+      ],
+      "must_not": [
+        "Picks a day or time on the user's behalf",
+        "Says the appointment is booked"
+      ]
+    }
+  ]
+}
