@@ -1,0 +1,19 @@
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+
+[tool.pytest.ini_options]
+# `pytest` runs the fast, deterministic suite in tests/ (no Ollama needed).
+# The live multi-turn runner is invoked explicitly: pytest e2e_assistant_runner.py
+testpaths = ["tests"]
+pythonpath = ["."]
+python_files = ["test_*.py", "e2e_assistant_runner.py"]
+addopts = "-ra --strict-markers --import-mode=importlib --tracing=retain-on-failure --screenshot=only-on-failure"
+markers = [
+    "unit: fast tests with the LLM faked, no browser or network",
+    "integration: real browser + real demo app, LLM faked",
+    "e2e: live run against a real LLM (Ollama/Azure) and the demo app",
+]
