@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Navi - Demo Assistant</title>
+  <style>
+    body { font-family: sans-serif; max-width: 480px; margin: 2rem auto; }
+    #log { border: 1px solid #ccc; height: 320px; overflow-y: auto; padding: 8px; }
+    .user-message { text-align: right; color: #06c; margin: 4px 0; }
+    .assistant-message { color: #222; margin: 4px 0; min-height: 1.2em; }
+    .error-message { color: #b00020; margin: 4px 0; font-style: italic; }
+    #chat-input { width: 75%; }
+  </style>
+</head>
+<body>
+  <h3>Navi (in-car assistant demo)</h3>
+  <div id="log"></div>
+  <input id="chat-input" placeholder="Say something..." autocomplete="off">
+  <button id="send-btn">Send</button>
+  <script>
+    const log = document.getElementById("log");
+    const input = document.getElementById("chat-input");
+    const sendBtn = document.getElementById("send-btn");
+    const history = [];
+    let pending = false;
+
+    function addMessage(cssClass, text, actions) {
+      const el = document.createElement("div");
+      el.className = cssClass;
+      el.textContent = text;
+      if (actions) el.dataset.actions = JSON.stringify(actions);
+      log.appendChild(el);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    async function send() {
+      const text = input.value.trim();
+      if (!text || pending) return;
+      pending = true;
+      sendBtn.disabled = true;
+      input.value = "";
+      addMessage("user-message", text);
+      history.push({ role: "user", content: text });
+
+      try {
+        const res = await fetch("/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages: history }),
+        });
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          const detail = typeof body.detail === "string" ? body.detail : JSON.stringify(body.detail);
+          throw new Error(detail || `HTTP ${res.status}`);
+        }
+        const { reply, actions } = await res.json();
+        history.push({ role: "assistant", content: reply });
+        addMessage("assistant-message", reply, actions || []);
+      } catch (err) {
+        history.pop();
+        addMessage("error-message", `Error: ${err.message}`);
+      } finally {
+        pending = false;
+        sendBtn.disabled = false;
+        input.focus();
+      }
+    }
+
+    sendBtn.addEventListener("click", send);
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") send(); });
+  </script>
+</body>
+</html>
