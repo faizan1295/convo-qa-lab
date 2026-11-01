@@ -1,0 +1,65 @@
+{
+  "note": "Clean, hand-written Navi conversations: no criterion is violated. Used as controls and as the base that violations are injected into.",
+  "items": [
+    {
+      "test_case": {
+        "test_name": "base_airport_tolls",
+        "description": "User asks for a route and then adds a preference.",
+        "user_persona": "Rushed commuter, informal",
+        "expected_behavior": ["Asks which airport before routing"],
+        "must_not": []
+      },
+      "transcript": [
+        {"turn": 1, "role": "user", "text": "Um, take me to the airport."},
+        {"turn": 1, "role": "assistant", "text": "Sure, which airport do you mean?"},
+        {"turn": 2, "role": "user", "text": "Uh, the international one, and avoid tolls please."},
+        {"turn": 2, "role": "assistant", "text": "Got it, I'll route you to the international airport and avoid tolls."}
+      ]
+    },
+    {
+      "test_case": {
+        "test_name": "base_music",
+        "description": "User asks for music without details.",
+        "user_persona": "Relaxed driver, casual",
+        "expected_behavior": ["Asks what kind of music before playing"],
+        "must_not": []
+      },
+      "transcript": [
+        {"turn": 1, "role": "user", "text": "Play something chill, you know."},
+        {"turn": 1, "role": "assistant", "text": "Sure, would you like a playlist or a specific artist?"},
+        {"turn": 2, "role": "user", "text": "A playlist, the lo-fi one."},
+        {"turn": 2, "role": "assistant", "text": "Okay, playing your lo-fi playlist."}
+      ]
+    },
+    {
+      "test_case": {
+        "test_name": "base_out_of_scope",
+        "description": "User asks something unrelated to driving, then makes a media request.",
+        "user_persona": "Bored passenger, chatty",
+        "expected_behavior": ["Politely says it can only help with navigation and media"],
+        "must_not": []
+      },
+      "transcript": [
+        {"turn": 1, "role": "user", "text": "Hey, can you tell me a good pasta recipe?"},
+        {"turn": 1, "role": "assistant", "text": "Sorry, I can only help with navigation and media controls. Want me to play some music instead?"},
+        {"turn": 2, "role": "user", "text": "Okay fine, play some jazz."},
+        {"turn": 2, "role": "assistant", "text": "Playing some jazz for you."}
+      ]
+    },
+    {
+      "test_case": {
+        "test_name": "base_destination_given",
+        "description": "User states a destination and then a route preference.",
+        "user_persona": "Calm professional, concise",
+        "expected_behavior": ["Keeps the destination from the first turn"],
+        "must_not": []
+      },
+      "transcript": [
+        {"turn": 1, "role": "user", "text": "Navigate to Central Station."},
+        {"turn": 1, "role": "assistant", "text": "Okay, setting Central Station as your destination."},
+        {"turn": 2, "role": "user", "text": "Avoid highways."},
+        {"turn": 2, "role": "assistant", "text": "Understood, I'll avoid highways on the way to Central Station."}
+      ]
+    }
+  ]
+}
